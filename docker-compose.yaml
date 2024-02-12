@@ -1,0 +1,38 @@
+version: "2.2"
+volumes:
+  db-data:
+  app-data:
+
+services:
+  db:
+    image: postgres:15.2-alpine
+    hostname: db
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: research
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      - db
+    command:
+      - /bin/sh
+      - -c
+      - |
+        poetry run python -m startup
+        poetry run uvicorn app.main:get_app --factory --no-server-header --proxy-headers --workers=2 --host=$API_HOST --port=$API_PORT
+    env_file:
+      - .env
+    volumes:
+      - /usr/src/app/.venv
+    ports:
+      - "80:$API_PORT"
