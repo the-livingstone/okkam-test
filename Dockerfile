@@ -24,6 +24,7 @@ WORKDIR /usr/src/app/
 COPY --from=builder /usr/src/app/.venv /usr/src/app/.venv
 COPY --from=builder /usr/src/app/app /usr/src/app/app
 COPY --from=builder /usr/src/app/startup.py /usr/src/app/startup.py
+COPY --from=builder /usr/src/app/tests /usr/src/app/tests
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
